@@ -32,6 +32,11 @@ public class Mob extends Entity {
 		if (ya > 0) direction = 1;
 		if (xa < 0) direction = 2;
 		if (xa > 0) direction = 3;
+		
+		if (!checkCollision(xa, ya)) {
+			x += xa;
+			y += ya;
+		}
 	}
 
 	public boolean checkCollision(int xa, int ya) {

@@ -31,7 +31,7 @@ public class Level {
 				t.tick(this, x, y);
 			}
 		}
-		
+
 		for (Entity e : entities) {
 			e.tick();
 		}
@@ -65,15 +65,11 @@ public class Level {
 		}
 		return null;
 	}
-	
+
 	public void add(Entity e) {
-		for (Entity entity : entities) {
-			if (entity.getID() != e.getID()) {
-				entities.add(e);
-			}
-		}
+		entities.add(e);
 	}
-	
+
 	public void remove(Entity e) {
 		e.remove();
 		if (e.isRemoved()) {

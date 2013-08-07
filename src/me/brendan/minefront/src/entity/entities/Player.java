@@ -33,6 +33,6 @@ public class Player extends Mob {
 	}
 
 	public void render(Screen screen) {
-		screen.render(Minefront.SHEET, x, y, 17, 0, true);
+		screen.render(Minefront.SHEET, x, y, 2, 0, true);
 	}
 }
