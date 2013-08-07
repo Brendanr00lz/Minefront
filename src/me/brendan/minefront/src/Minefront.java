@@ -12,28 +12,31 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import me.brendan.minefront.src.entity.entities.Player;
 import me.brendan.minefront.src.graphics.Screen;
 import me.brendan.minefront.src.graphics.SpriteSheet;
+import me.brendan.minefront.src.input.InputHandler;
 import me.brendan.minefront.src.level.Level;
 
 public class Minefront extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
 	private static final String NAME = "Minefront";
-	public static final int WIDTH = 160;
+	public static final int WIDTH = 170;
 	public static final int HEIGHT = 120;
-	private static final int SCALE = 5;
+	private static final int SCALE = 7;
 
 	private boolean running = false;
 	private Thread thread;
 
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	private BufferedImage overlay;
 	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
 	public static SpriteSheet SHEET;
 	private Screen screen;
 	private Level level;
+	private Player player;
+	private InputHandler input;
 
 	public void start() {
 		if (running) return;
@@ -97,15 +100,18 @@ public class Minefront extends Canvas implements Runnable {
 		SHEET = new SpriteSheet("/icons.png");
 		screen = new Screen(WIDTH, HEIGHT);
 		level = new Level(64, 64);
-		try {
-			overlay = ImageIO.read(Minefront.class.getResource("/overlay.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		input = new InputHandler(this);
+		player = new Player(0, input);
+		level.add(player);
 	}
 
 	private void tick() {
-		level.tick();
+		if (!hasFocus()) {
+			input.releaseAll();
+		} else {
+			input.tick();
+			level.tick();
+		}
 	}
 
 	private void render() {
@@ -114,10 +120,10 @@ public class Minefront extends Canvas implements Runnable {
 			createBufferStrategy(3);
 			return;
 		}
-		
-		int xScroll = 0;
-		int yScroll = 0;
-		level.renderBackground(screen, xScroll, yScroll);
+
+		int xScroll = player.x - screen.width / 2;
+		int yScroll = player.y - screen.height / 2;
+		level.render(screen, xScroll, yScroll);
 
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = screen.pixels[i];
@@ -129,8 +135,7 @@ public class Minefront extends Canvas implements Runnable {
 		int yo = (getHeight() - hh) / 2;
 		Graphics g = bs.getDrawGraphics();
 		g.fillRect(0, 0, getWidth(), getHeight());
-		g.drawImage(image, 203, 36, 583, 524, null);
-		g.drawImage(overlay, xo, yo, ww, hh, null);
+		g.drawImage(image, xo, yo, ww, hh, null);
 		g.dispose();
 		bs.show();
 	}
